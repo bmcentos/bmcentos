@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#inicio
+echo "Esse é um teste"
