@@ -59,4 +59,5 @@ Verificar instancia criada:
 Subir container baseado na imagem copiada anteriormente:
 #docker run -it --name vm03 bmcentos/ubuntu-v:0.1
 
-
+Usar porta do container na porta local do pc
+#docker exec -d -p 8081:80 --name vm01 wordpress
