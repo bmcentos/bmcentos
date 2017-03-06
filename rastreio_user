@@ -1,0 +1,26 @@
+shodan - O google dos hackers (Pesquisa dispositivos conectados na internet)
+
+Usa-se strings (dorks) para pesquisa avançada
+
+EX: country:br  (Busca dispositivos conectados no brasil)
+    country:br city:Hortolandia 
+    country:br os:xp (faz busca pelo sistema operacional)
+    city:campinas "tp link" (busca por dispositios tp link em campinas)
+    city:campins microkit
+    port:22 city:campinas (verifica dispositivos com a opera 22 aberta)
+    port:21 vsftpd 2.3.4 (verifica versao de vsftp vulneravel)
+    country:br ATM (caixa eletronico)
+    geo:22.8864903!4d-47.2218653 (Verifica dispositivos proximos da localização do maps)
+    hostname:dominio.com (pesquisa por hostname)
+
+-----------------------------------------------------
+
+Maltego
+
+Faz processo automatizado de coleta de informações
+
+O maltego funciona com processos, onde cada machine funciona para um processo:
+
+O maltego utiliza informações publicas, e não toca no server 
+
+Utilizar modo MANUAL

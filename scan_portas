@@ -1,0 +1,59 @@
+Scaneamento de portas:
+
+Faz o handshake (Conexão TCP)
+
+client	servidor
+SYN    >  
+       <  SYN, ACK
+ACK    >  
+GET / HTTP/1.0 (Faz a conexão)
+
+Porta aberta= SYN+ACK (SA = Syn+Ack)
+Porta fechada= RST
+
+hping3 - Montador de pacote
+#hping3 <flags> <opç> <alvo>
+flags= --fin, --syn, --push, --ack, --urg
+
+hping --syn -c 1 -p 80 dominio.com.br
+
+--syn=Não faz conexão com o sevidor (syn>syn,ack>ack conexão fexada - Sem barulho)
+
+nmap -sS -p 80 dominio.com.br (Usa-se o --syn)
+
+O nmap verifica se a porta esta filtrada (iptables) o hping3 não identifica
+
+nc -vnpl 8000  (Maquina alvo - Escuta porta especificada)
+
+nmap -sS -p 8000 alvo  (Não faz barulho (scan SYN) no alvo e não fecha conexões)
+nmap -sT -p 8000 alvo  (Faz barulho e conexão TCP no alvo)
+nmap -sV alvo (Faz versionamento dos sistemas rodando no alvo - barulhento)
+nmap -sV -sS alvo (Faz o versionamento, porem com menos barulh)
+nmap alvo - (Bastante barulhento)
+nmap -vv alvo - (Mostra o que esta tentando fazer)
+nmap 192.168.1.0/24 --exclude 192.168.1.14 - (Faz scan em toda a rede e não faz no ip --exclude, caso tenha firewall por exemplo)
+nmap alvo --reason (Identifica o por que a porta esa aberta)
+nmap -O avo - Identifica SO
+nmap -p 80,21,22 alvo - Verifica as portas especificadas
+nmap -
+-----------------------------
+
+Varredura ICMP
+
+ping (verifica pacote ICMP) requisição de tipo 8 - echo request
+                            host remoto resposta de tipo 0 - echo reply
+
+fping (Verifica pacote ICMP de forma automatizada)
+
+fping -c 2 -g 192.168.1.0 192.168.1.255 (Faz um ping em todos os dispositivos da rede)
+
+A saida saira suja, direcionar saida de erro para dev/null (2>)
+
+nmap -sP 192.168.1.0/24 - Encontra os hosts ativos da rede tambem (ping scan)
+
+
+
+
+
+
+

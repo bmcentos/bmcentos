@@ -1,0 +1,23 @@
+Metodo metaexploit
+
+Verifica conexão com o banco postegreSQL
+#db_status
+
+Seta utilização do modulo email colector
+#use auxiliary/gather/search_email_collector 
+
+Mostra opções a serem utilizadas pelo modulo
+#show options
+
+Seta a opção DOMAIN, que buscara no dominio especificado
+#set DOMAIN dominio.com.br
+
+Faz a execução do exploit
+#exploit ou run
+
+-----------------------------------
+
+Utilizando theHarvester
+
+Busca o dominio especificado pela opção "-d", com limite de 500 buscas e em todos os motores de buscas "all"
+#theharvester -d cast.com.br -l 500 -b all
