@@ -1,0 +1,21 @@
+Interfaces administrativas:
+
+
+Enumeração de arquivos e diretorios, paginas administrativas
+Codigos fontes
+Robots.txt 
+
+Ferramentas: Google dorcks
+
+Ex: intitle:site.com.br painel
+    inurl:login.php
+
+Wordpress: wpscan
+
+Admin pager finder (são scripts python)
+https://dl.packetstormsecurity.net/UNIX/utilities/AdminpageFinder.py.txt
+
+
+joomscan
+
+uniscan
