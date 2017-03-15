@@ -1,0 +1,34 @@
+#!/bin/bash
+list=lista
+################################
+#  author: Bruno M. Santos     #
+################################
+
+#crie um arquivo "lista" com o nome dos servidores ou Ips para acesso
+clear
+echo "###########################################"
+echo -e "\e[1;31mTeste de conexão SSH em lote\e[0m"
+echo "Digite o nome do user:"
+read user
+echo "Usuario: $user"
+echo "____________________________________________"
+stty -echo
+echo "Digite a senha do susuario $user"
+read senha
+echo "___________________________________________"
+echo "Testando acesso SSH com o usuario $user..."
+stty sane
+cat $list | while read host
+do
+sshpass -p $senha ssh -n $user@$host echo 2> /dev/null
+if [ $? = 0 ]; then
+echo -e "$host = Conexão - \e[32mOk\e[0m"
+else
+echo -e "$host = Conexão - \e[31mFail\e[0m"
+fi
+done
+echo "###########################################"
+
+#NOTA: a opção "-n" no ssh é fundamental, pois nao roda o ssh na stdin, permitindo apenas testar a conexão
+
+#NOTA: Caso precise formatar arquivo para deixar no padão do script:  cat lista |tr ', ' '\n' | sed '/^$/d'
