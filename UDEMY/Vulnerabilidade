@@ -1,0 +1,41 @@
+SecurityFocus - Pagina da internet
+-Verificar falhas de serviços - Aplicação Web
+-Em alguns casos tem o exploit da vulnerabilidades
+-Identifica a resolução da falha - Medida para correção da falha
+-Pesquisa falhas em serviços mais recentes
+-Na aba discussion tem informações sobre a falha
+
+Exploit Database - informações de Ferramentas de exploração
+-Pode ser usado em conjunto com o metaesploit para explorar payloads
+-Verifica por nome de serviço e por codigo de exploit
+
+Ferramentas de analise de vulnerabilidades - Scanners
+
+Nessus
+-Analisa toda a maquina e verifica falhas de versoes de aplicativos e falhas graves
+-Versão gratuita é limitada
+-OpenVas é outra ferramente, gratuita feita do Nessus, após o mesmo se tornar pago em 2005
+
+OpenVas
+-Analise de vulnerabilidades baseado no Nessus
+-OpenSource
+-Melhor software de scan de vulnerabilidades OpenSource
+-Adquirido via apt-get
+-Rodar o comando "openvas-setup" para configurar o aplicativo
+-openvasmd, gerencia usuarios do aplicativo
+    openvasmd --user=admin --new-password=admin
+    openvas-start
+
+-Acesso via browser pela porta 9292
+-Pode utilizar o scan quick start, os logs do scan aparecerão em "scan management>Tasks" e iniciar os scans currents
+-Acesso aos reports e resultados pelo "scan management" e pod
+-Podee ser exportado para .pdf
+-Pode configurar usuarios adicionais na aplicação
+-Pode configurar recebimento de e-mail e SMS, alem de agendamento de scan
+
+
+
+
+
+
+

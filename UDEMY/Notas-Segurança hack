@@ -1,0 +1,25 @@
+Relatorios de pentest:
+
+Sumario executivo:
+	Preparado para os executivos da empresa, mostrando em graficos problemas e soluções a serem implementadas
+	Prazos para soluções de problemas
+	Ações que necessitarão ser tomadas
+
+Obs: Para os consulltores de segurança, não cabe a manutenção e correção das vulnerabilidades, apenas identifica e apresenta soluções.
+
+Relatorio Técnico:
+	Passo a passo com telas e evidencias de quebras de senhas, acessos a informações sensiveis e etc. 
+	Como se fosse um tutorial, informando passo a passo as falhas encontradas e exploradas
+	Documentar todas as informações
+----------------------------------------
+
+No ambiente de Teste sera usado o Kali Linux e o Metaesploitable, alem de windows e android
+
+Dica para VMS:
+	Site: http://www.osboxes.org/   Contem vms ja prontas (Linux)
+
+Baixar imagens da microsoft:
+
+Usar script javascript em: http://pastebin.com/EHrJZbsV e colar no console da pagina de downlod do site da microsoft (f12)
+
+

