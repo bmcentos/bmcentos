@@ -1,0 +1,63 @@
+docker trabalha com containers, que seriam as VMs
+
+verificar as imagens instaladas 
+#docker images
+
+procurar imagens disponiveis no repositorio hub docker
+#docker search ubuntu
+
+baixar imagem para o sistema
+#docker pull ubuntu
+
+Subir instancia em segundo plano com deamon
+#docker run -dt --name vm01 ubuntu
+
+run = executa a vm
+-dt = Sobe a vm como deamon (em segundo plano)
+-name = Nomeia a vm para vm01
+
+Subir instancia interagindo no momento do start
+#docker run -it --name vm02
+-it = Modo interativo, dessa forma o acesso ja é concedido
+
+#Sair da instancia sem "matar" (caso de exit, a instancia cai)
+Ctrl+p+q
+
+#Acessar container em segundo plano
+docker exec -it vm01 bash
+	OBS: Caso de "exit" nesse ponto, a instancia não cai
+
+#Formatar a saido do "docker ps" para saida mais clara
+docker ps --format '{{.Names}},{{.Image}},\n{{.Status}}, Portas: {{.Ports}}\n'
+
+A saida desse comando mostrará os nomes das instancias Up seguido da imagem utilizada (ubuntu, centos e etc), tempo de uptime e qtdde de portas utilizada.
+
+reiniciar container (vm)
+#docker restart vm01
+
+Parar a container (vm)
+#docker stop vm01
+
+Iniciar container (vm)
+#docker start vm01
+
+Verificar instancias executadas
+#docker ps
+
+Verificar todas as instancias até q estão paradas:
+#docker ps -a
+
+Executar operações nas instancias sem entrar no sistema
+#docker exec vm01 ls -la /etc/passwd
+
+Realizar commit na instancia e copia da imagem (Podera ser utilizada posteriormente)
+#docker commit vm01 bmcentos/ubuntu-v:1.0
+
+Verificar instancia criada:
+#docker images
+
+Subir container baseado na imagem copiada anteriormente:
+#docker run -it --name vm03 bmcentos/ubuntu-v:0.1
+
+Usar porta do container na porta local do pc
+#docker exec -d -p 8081:80 --name vm01 wordpress

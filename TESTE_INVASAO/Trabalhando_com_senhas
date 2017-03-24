@@ -1,0 +1,57 @@
+O que é senha:
+
+guarda acesso a informações confidenciais e pessoais
+
+Caminhos:
+
+-Dica de senha (engenharia social)
+-Pergunta de segurança (engenharia social)
+-Mecanismo de alteração de senha (Engenharia social)
+
+www.acunetix.com (as senhas mais usadas) 
+
+O Obvio funciona muito
+
+Variação de leet (hacker = h@ck#r)
+
+Verificar wordlis no pastebin.com (exposed)
+
+inurl:pastebin.com senha
+---------------------------------
+BRUTE FORCE
+
+É baseado em wirdlist (Arquivo com dicionario de senhas)
+-Obter wordlist na internet
+-Criar wordlist
+No kali linux, ha algumas wordlist no /usr/share/wordlists
+-----------------------------------------
+-Criação de wordlist:
+
+ crunch - Faz a criação de wordlist personalizada)
+ crunch 6 8 123456789 > arquivo.txt  (cria senhas de 6 a 8 digitos, com numeros de 1 a 9)
+ crunch 8 8 a-z123456789 > arquivo.txt (cria senhas com 8 digitos, de a a z, 1 a 9)
+ crunch 8 8 -t senha@@@@ > wordlist (Cria senhas com o padrão "senha+4 campos numericos"
+OBS: Opçao interessante:
+ -t = @=text, %=Numero, ^=Caractere especial
+EX: palavra: ab123@@
+crunch 7 7 -t @@%%%^^ 
+
+ cewl - Faz busca de wordlist baseada em URL de sites
+ cewl www.comptecbrasil.com.br -m 6 (Faz busca no site, com palavras de no minimo 6 digitos)
+
+ cupp - Projeto do github (não é nativo do kali)
+ cupp - Faz levantamento de informações do Alvo, para fazer wordlist
+ ./cupp.py -i (Faz questionario e cria wordlist)
+
+----------------------------------------
+Fazendo o brute force:
+
+hydra - Tem suporte a maioria das tecnologias para acesso
+
+Exemplo:
+ hydra -L login.txt -P wordlist.txt 192.168.1.2 ftp
+	Realiza tentativas de acesso FTP usando wordlist para usuario e senha (-L e -P)
+	Caso saiba o nome do user, usar -l usuario
+   OBS: Esse metodo é barulhento, e acusa nos logs do servidor, IPS e tcpdump
+
+Site para test: attack.samsclass.info
