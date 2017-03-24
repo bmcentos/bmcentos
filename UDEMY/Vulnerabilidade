@@ -33,6 +33,36 @@ OpenVas
 -Pode configurar usuarios adicionais na aplicação
 -Pode configurar recebimento de e-mail e SMS, alem de agendamento de scan
 
+------------------------------------------------------------------------------
+
+Scanner de vulnerabilidade de serviços
+
+OWASP-Zap  -  Scanner de vulnerabilidade Web generico
+-faz crawler (Identifica subpastas da aplicação)
+-Identifica as falhas de segurança da aplicação e de codigos vulneraveis
+-Pode configurar o nivel de profundidade do scan
+-Descreve o problema encontrado
+-Permite explorar algumas vulnerabilidades encontradas (abre no navegador erros e brexas do sistema)
+
+
+Wpscan  -  Scan de aplicações Web Word Press
+-Funciona em modo TEXTO
+-Pode mascarar IP de origem usando proxy
+-Pode ser feito brute force com wordlist
+-Pode filtrar com o "--enumerate" alguns filtros para testes
+-Identifica paginas de logins, plugins vulneraveis, versão de WP etc.
+
+Ex de utilização:
+
+Faz o scan generico da aplicação
+wpscan --url www.site.com
+
+Tenta enumerar usuarios da aplicação (Ajudando para posterior ataque de força bruta)
+wpscan --url www.site.com --enumerate u
+
+Tentativa de força bruta
+wpscan --url www.site.com --wordlist lista.lst --username usuario
+
 
 
 
