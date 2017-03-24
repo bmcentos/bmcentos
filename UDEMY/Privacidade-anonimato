@@ -1,0 +1,85 @@
+Formas de se proteger com o anonimato
+
+Proxyes/Vpns etc
+
+Tor
+-Rede p2p 
+-Utiliza varios proxies para se conectar no destino
+
+Instalação do serviço: 
+apt-get install tor
+
+Iniciar o serviço tor
+service tor start
+
+Baixar o cliente no site tor e executar como non-root
+-É necessario criar um usuario para executar o client tor
+-Logar na interface grafica 
+-Executar o browser cliente que foi baixado do site
+
+Verificando efetivação do anonimeto com o tor:
+
+dns leak test - Teste online
+-Mostra em que localidade esta utilizando a VPN
+
+No proprio navegador tor é possivel verificar quais proxies estao sendo utilizados, e modificar as rotas
+
+NÃO UTILIZAR O GOOGLE COM PESQUISAS, pois o google rastreia acesso, navegador e etc.
+
+Utilizar duckduckgo, que não guarda informações e ainda permite pesquisar sites da deepweb.
+---------------------------
+
+ProxyChains
+-Serviço do kali linux para fazer encadeamento e utilizar proxy em outros aplicativos (não apenas no browser_
+
+/etc/proxychains.conf
+
+Por padrão utiliza a opção strict chains, que faz o uso de cadeias de proxyes, e caso um proxy falhe no meio do caminho, a conexão é dropada
+strict_chains #Comentar essa opção
+
+dynamic_chain  #Descomentar essa opção, para pular os deads proxyes, para usar apenas proxyes lives.
+
+proxy_dns  #Descomentar essa opção, para não haver vazamento de dns
+
+socks5 127.0.0.1 9050 #Adicionar o sockes 5, para habilitar recursos adicionais na utilização de proxyes
+
+--------------------------------------
+
+Utilização (Utilizar o proxychains antes do comando requerido):
+
+Utilizar "anonimato" para fazer uma varredura com nmap
+proxychains nmap 125.65.251.55
+proxychains nmap 251.52.32.0/24 -p 80
+
+Utilizar proxychains para abrir navegador:
+proxychains firefox www.duckduckgo.com.br
+
+OBS: O proxychains pode ser utilizado com qualquer aplicação e pode ser usado em conjunto com o tor
+
+Pode se usar novos servidores Proxyes:
+-Pesquisar "free socks5 servers"
+-Adicionar IP e Porta (Dos servidores proxyes encontrados) no proxychains.conf
+  Ex: socks5 189.253.21.21 8084
+-Muitos proxyes não funcionam, pois bloqueiam trafego.
+-Caso não funcione, como a configuração do proxychains esta como dinamica, ele realizara o pulo dos deads proxyes, e utilizar um proxy funcional
+-Para adicopnar os proxyes manuelmente, comente a linha dos proxyes do tor:
+  #socks4 127.0.0.1 9050 
+  #socks5 127.0.0.1 9050
+-Pode ser testado o proxy no proprio navegador, nas configurações de proxy
+----------------------------------------
+
+VPN Gratuita
+
+OpenVPN
+VPNbook - Openvpn
+-Permite logar em vpns gratis, com usuario e senha informado no site vpnbook e baixar o arquivo do openVPN
+-Utilizando a VPN, com openvpn:
+-Buscar o pais que quer usar a VPN
+  #openvpn vpnbook-de233-tcp80.opvpn
+    Digitar usuario e senha coletado no site vpnbook
+-Testar no dns leak test se funcionou
+------------------------------------
+
+Pra melhorar a privacidade sem risco algum, a utilização do wifi aberto em locais publico é fundamental.
+
+
