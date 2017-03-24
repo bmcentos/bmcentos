@@ -1,0 +1,74 @@
+Metasploit - Identifica e explora vulnerabilidade
+-Utiliza payloads - Codigos maliciosos que visam ganhar acesso indevido ao sistema
+-É baseado em python, podendo criar extenções e etc
+-Necessario identificar endereço de memoria para inserir codigos
+
+
+Para abrir:
+ativar o serviço do postgresql
+
+Criar banco e conexão com metasploit:
+msfdb init
+
+service postegresql start
+
+Abrir console:
+msfconsole
+
+Listar comandos disponiveis:
+?
+
+Verificar conexão com postgresql:
+db_status
+
+Para conectar com o banco:
+db_connect
+
+Exportar dados do banco:
+db_export -f xml export.xml
+
+Importar dados em XML, gerado pelo nmap por exemplo, ou outros scanners:
+db_import resultados.xml 
+
+Verifica hosts disponiveis para exploit:
+hosts
+
+Verifica serviços que o nmap encontrou e jogou no arquivo xml 
+services
+
+faz scanner direto no msfconsole e ja armazena informações no banco OBS: O db_nmap tem as mesmas funcionalidades do nmap:
+db_nmap -A 192.168.1.0/24
+
+Fazer atualização nos exploits:
+msfupdate
+-----------------------------------------------------------------------------
+
+Pesquisa de exploits:
+
+Pesquisa simples - Verifica opções de busca no msfconsole:
+search -h
+search firefox
+
+Faz pesquisa de xploits de 2016 encontrados no lado do cliente (browsers, serviços e etc)
+search cve:2016 type:exploit app:client
+
+Nas descrições das falhas, exite um ID do exploit e ranking de sucesso na tentativa normal|good|great|excellent (Os excellent tem muita possibilidade de ser efetivo)
+
+------------------------------------------------------------------------------
+
+Selecionando o exploit:
+use exploit/windows/smb/ms08_067_netapi
+  OBS: Esse exploit explora vulnerabilidades em sistemas windows, com serviços SMB
+  
+Verifica opções do payload:
+show options
+  OBS: Algumas opções mostradas são necessarias serem setadas para carregar o payload
+  
+  
+---------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+Gerar XML com nmap
+NMAP: 
+
+Faz a varredura e gera um arquivo XML dos resultados
+nmap -A -oX resultado.xml 192.168.1.0/24
