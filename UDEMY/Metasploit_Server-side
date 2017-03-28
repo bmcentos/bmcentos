@@ -236,7 +236,15 @@ shell
 
 OBS: Os payload que estão como "stager", não possuem todos os codigos necessarios para abrir conexão com a vitima, e precisam do multhandler, que funcionará como um servidor para realizar essa conexão)
      Os payload que estão como "inline", ja conectam e possuem os codigos para acesso total na vitima
+----------------------------------------
 
+PAYLOAD para tela azul do windows:
+
+Verifica se o Windows 7 é vulneravel:
+auxiliary/scanner/rdp/ms12_020_check
+
+Realiza o blue screen
+auxiliary/dos/windows/rdp/ms12_020_maxchannelids
 
 
 
