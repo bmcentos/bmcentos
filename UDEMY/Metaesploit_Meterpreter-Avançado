@@ -114,7 +114,7 @@ run vnc
 
 ###A tela sera aberta automaticamente
 -------------------------------------
-
+PIVOTING
 tendo acesso a maquina em rede interna, via maquina acessivel com duas interfaces (duas redes diferentes)
 
 Cenario:
@@ -149,7 +149,7 @@ exploit.
 
 ###No caso acima, a rede 192.168.136.0 esta disponivel apenas dentro do metepreter.
 -----------------------------------------
-
+PIVOTING
 METODO 2 PARA conseguir acesso em rede distinta.
 
 utilizar o socks4
@@ -170,6 +170,8 @@ socks4 172.0.0.1 1080   #Adicionar essa linha, que ira fazer o direcionamento da
 Apos salvar o arquivo, ja poderemos usar o proxychains para identificar a rede interna da maquina remota.
 
 proxychains nmap -Pn 192.168.136.0/24
+
+###Dessa maneira, podemos identificar as falhas nos dispositivos da rede 192.168.136.0 utilizando o proxychains e fazer os exploits pelo metaesploit e meterpreter
 
 
 
