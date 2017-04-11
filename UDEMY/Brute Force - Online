@@ -1,0 +1,138 @@
+No bruteforce, temos dois metodos:
+
+Online
+-Fazemos diretamente na aplicação
+
+Offline
+-Fazemos depois de capturar alguma hash de senha 
+
+Para força bruta, precisamos de uma wordlist forte para tentar quebrar as senhas.
+-Podemos montar a wordlist com o crunsh por exemplo, ou buscar na internet
+
+Pesquisa senhas mais usadas na internet:
+
+inurl:pastebin.com 12345678 querty password
+site:pastebin.com 12345678 querty password
+
+OBS: O pastebin é um sistema de vazamento de dados online, e funciona em arquivos texto que facilita para capturarmos os dados e montarmos a nossa wordlist.
+-O pastebin permite fazer o download da woedlist.
+
+-É necessario tratar o arquivo wordlist baixado.
+-Muitas vezes vem com senhas duplicadas, ou mal formatados
+-Usar o cut, tr, sed, uniq e etc para configurar e formatar os dados do arquivo
+
+----------------------------------
+CRUNCH - Gera wordlist conforme informações passadas
+
+Uso:
+  crunch <min> <max> [options]
+  
+Exemplos:
+
+Criar wordlist com numeros de 0 a 9 e com 8 digitos
+  crunch 8 8 0123456789
+  
+Criar wordlis com letras de a-z com digitos de 6 a 8
+  crunch 6 8 abcdefghijklmnopqrstuvxyz
+  
+Criar wordlist e enviar para um arquivo:
+ crunch 8 8 0123456789 > wordlist.txt
+ 
+Criar wordlist personalizada com palavra definida e 3 numeros na frente Ex: senha123, senha321 etc.
+ crunch 8 8 -t senha%%%
+ 
+Podemos passar juntamente com a opção "-t", os valores abaixo correspondente a quantidade de caracteres com valores personalizados
+@ will insert lower case characters 
+, will insert upper case characters 
+% will insert numbers 
+^ will insert symbols
+----------------------------------------------
+
+Usando o HYDRA para quebrar senhas:
+
+Quebrando senhas de serviços (Pode ser usado com ssh, telnet, ftp, pop3 e etc):
+
+hydra -l admin -P wordlist.txt 192.168.1.10 pop3
+Opções:
+-l = Usuario
+-P = Arquivo wordlist
+host = Ip do servidor
+protocolo = Protocolo utilizado para quebra
+
+Quebrando senhas de fromularios http:
+
+-Tentar fazer o login para verificar a mensagem de erro.
+-Usar mensagem de "erro de login" para fazermos o bruteforce
+-Usar o burp para capturar o formulario
+-Usar a opção "intercept on"
+-Enviar informações para o intruder "send to intruder"
+-Determinar as opções das variaveis "username=" e "password="
+-Setar tipo de ataque "Cluster Bomp" (para brute force)
+-Na aba payloads, carregar os dois Payloads e configurar 1 a 1 a wordlist que ira utilizar (Payload 1 sera usuario e o 2 a senha).
+-Na aba options, nas opções "grep - match" Adicionar no campo "add" A informação de sussesso de login, para sabermos que o ataque foi bem sucedido.
+-Clicar em start ataque para iniciar o brute force
+-Identificar a variação de tamanho na coluna "lengh" e a marcação da caixa que informamos a mensagem do "grep - match" anteriormente.
+
+------------------------------------------------------
+
+Quebra de senha Offline
+
+John the riper (Faz força bruta offline)
+
+-É necessario possuir o hash da senha a ser quebrada.
+-As senhas são adquiridas via hashdump, ou do /etc/shadow por exemplo
+
+Uso:
+
+john arquivo.txt --wordlist=wordlist.txt
+-Caso a senha ja tenha sido descoberta, e não seja exibida na tela, usar a opção "--pot" que fara com que ele execute a quebra novamente
+
+
+john arquivo.txt --wordlist=wordlist.txt --pot=senha
+
+OBS: Ha muitas outras opções no john, para quebra de senhas.
+
+----------------------------------------
+
+Hashcat e OclHashcat (Faz quebra de senha offline) Fazem uso da GPU para processar
+
+Permite quebra de senhas inclusive de arquivos .zip e rar e etc
+
+O oslHashcat utiliza um acelerador grafico potente, e em vms pode prejudicar a utilização do host, pois acelera o processamento dependendo da complexidade da senha
+
+Para a quebra da senha é preciso passar o codigo do modulo que sera utilizado: hashcat -h | grep NTLM 
+### O NTLM é um conjunto de protocolo do windows que fornece segurança na autenticação
+-Usar o codigo do hashcat na saida do comando acima (no caso 5600)
+
+Uso:
+hashcat -m 5600 -a 0 -o arquivo_de_saida.txt hash_windows.txt wordlist.txt
+
+Opções:
+-m = Seleciona o codigo do modulo
+-a = A opção 0 informa que ira ser feito uso de dicionario de senha
+-o = informa o nome do arquivo de saida do comando
+hash_windows.txt = Arquivo cntendo os hashs das senhas
+wordlist.txt = Wordlist utilizada
+
+Obs: Os resultados estarão no arquivo de saida, no final das linhas.
+
+
+--------------------------------------
+
+Rainbow Tables - (Faz quebra se senha reversa e muito mais rapido)
+-As wordlist podem ser baixadas ou criadas
+-Pesquisar por rainbow tables gratuitas
+-Os arquivos wordlist rainbow tables serao muito grandes, porem o processo é muito mais rapido
+-Ha serviços online gratuitos que fazem a quebra de hash usando o rainbow table
+  Crackstation.net
+  hashkiller.co.uk
+  
+-Para testar a efetividade, podemos gerar o hash de uma senha qualquer e trentar quebrar posteriormente:
+  Site para gerar md5: sh1-online.com
+  
+ No hashkiller por exemplo, tem opção de quebrar senhas WPA, NTLM (Windows), md5 e md1
+ 
+ -Boa pratica:
+  Usar sempre a primeira opção de quebra online para evitar desperdicio de trabalho
+ 
+
