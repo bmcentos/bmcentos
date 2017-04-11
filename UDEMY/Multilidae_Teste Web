@@ -1,0 +1,12 @@
+Para utilizar essa ferramenta do metaesploitable, configurar o seguinte arquivo:
+
+/var/www/multilidae/config.inc
+-Caso a linha $dbname, esteja com o valor "multilidae" alterar para "owasp10"
+-Reiniciar o apache
+
+-O multilidae é um sistema vulneravel e que auxilia nos metodos no exploração.
+
+Exemplo para SQL injections:
+
+No campo usuario adicionar:
+" or 1=1 -- "
