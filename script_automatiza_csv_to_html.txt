@@ -1,0 +1,40 @@
+#!/bin/bash
+#FAZ O LEVANTAMENTO DE MAQUINAS RHEL E DISPONIBILIZA EM HTML
+#CRIAR ARQUIVO TEMP DE SENHA = pass
+#CRIAR ARQUIVO = vm (Lista de maquinas virtuais do ambiente)
+CSV="/path/to/VMS_LINUX_BETA.csv"
+
+echo "VM;RHEL RELEASE;ARCH" > vms_linux.txt
+echo " " >> vms_linux.txt
+
+for i in `cat vms_spo`; do sshpass -f pass ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no user@$i "hostname; cat /etc/*ease | grep release | so                           rt | uniq; uname -p;  echo" ; done 2> /dev/null | tee -a vms_spo_linux.txt
+
+
+#FORMATA A SAIDA PARA ARQUIVO CSV
+cat vms_linux.txt | tr '\n' ';' | sed 's/;;/\n/g' | tr -d '#' > $CSV
+clear
+#VERIFICA VERSOES DE RHEL
+VAR5=`grep " 5." $CSV | wc -l`
+VAR6=`grep " 6." $CSV | wc -l`
+VAR7=`grep " 7." $CSV | wc -l`
+
+echo "RHEL 5 = $VAR5"
+echo "RHEL 6 = $VAR6"
+echo "RHEL 7 = $VAR7"
+echo
+echo "TOTAL = `expr $VAR5 + $VAR6 + $VAR7`"
+
+#FORMATA ARQUIVO CSV PARA HTML
+#HTML
+HTM=rhel_vcenter.html
+echo "<table>" > $HTM ;
+print_header=true
+while read INPUT ; do
+  if $print_header;then
+        echo "<tr><th>$INPUT" | sed -e 's/:[^,]*\(,\|$\)/<\/th><th>/g' >> $HTM
+        print_header=false
+  fi
+        echo "<tr><td style=\"border-style: inset;\">${INPUT//;/</td><td style=\"border-style: inset;\">}</td></tr>" >> $HTM ;
+        done < /drives/d/Users/bsmiquelini/Desktop/VMS_LINUX.csv ;
+        echo "</table>" >> $HTM
+
